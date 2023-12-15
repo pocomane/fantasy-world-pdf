@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head>
+    <title>Title</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+
+    .PageBreak {
+      page-break-after: always;
+    }
+
+    @font-face {
+      font-family: "thefont";
+      src: url(../util/gentium.ttf) format("truetype");
+      /* src: url(../util/doulos-sil.ttf) format("truetype"); */
+      /* src: url(../util/liberationserif.ttf) format("truetype"); */
+      /* src: url(../util/foglihten068.otf) format("opentype"); */
+      /* src: url(../util/munson.otf) format("opentype"); */
+      /* src: url(../util/quaaykop.otf) format("opentype"); */
+      /* src: url(../util/test.ttf) format("truetype"); */
+      /* src: url(../util/test.otf) format("opentype"); */
+    }
+
+    a:link {
+      text-decoration: none;
+      color: #000000;
+    }
+    a:visited {
+      text-decoration: none;
+      color: #000000;
+    }
+    a:hover {
+      text-decoration: none;
+      color: #000000;
+    }
+    a:active {
+      text-decoration: none;
+      color: #000000;
+    }
+
+    ul {
+      padding-left: 5mm;
+      list-style-type: disc;
+    }
+    
+    .toc ul {
+      padding-left: 5mm;
+      list-style-type: none;
+    }
+
+    :root {
+      --FS:  3.2mm; /* default font size */
+      --LH:  4.6mm; /* default line height */
+      --FS1: 4.0mm; /* bigger font size n.1 */
+      --FL1: 4.6mm; /* first letter of the bigger font size n.2 */
+    }
+
+    @page {
+      size: A5;
+      margin-bottom: 17mm;
+      margin-top: 12mm;
+      @bottom-center{
+        font-size: var(--FS);
+        content: "- " counter(page) " -";
+      }
+    }
+    @page :first {
+      @bottom-center{
+        content: "";
+      }
+    }
+    @page :left {
+      margin-left: 23mm;
+      margin-right: 20mm;
+    }
+    @page :right {
+      margin-left: 20mm;
+      margin-right: 23mm;
+    }
+    body {
+      font-family: thefont;
+      column-count: 1;
+      column-fill: balance;
+      font-size: var(--FS);
+      line-height: var(--LH);
+      text-align: justify;
+      margin: 0;
+      padding: 0;
+    }
+    .toc {
+      column-count: 2;
+      column-fill: balance;
+      text-align: left;
+    }
+    div {
+      margin: 0;
+      padding: 0;
+    }
+    em {
+      font-weight: normal;
+      text-transform: uppercase;
+      font-size: var(--FS);
+    }
+    strong {
+      font-weight: normal;
+      text-transform: uppercase;
+      font-size: var(--FS);
+    }
+    hr {
+      width: 50%;
+      border-style: hidden;
+    }
+    h1 {
+      text-align: center;
+      text-transform: uppercase;
+      font-size: var(--FS1);
+      border-top: 1pt solid;
+      padding-top: 2mm;
+      page-break-before: always;
+    }
+    h1:first-letter {
+      font-size: var(--FL1);
+    }
+    h2 {
+      text-transform: uppercase;
+      font-size: var(--FS1);
+    }
+    h2:first-letter {
+      font-size: var(--FL1);
+    }
+    h3 {
+      text-transform: uppercase;
+      font-size: var(--FS1);
+    }
+    h3:first-letter {
+      font-size: var(--FL1);
+    }
+    h4 {
+      text-transform: uppercase;
+      font-size: var(--FS1);
+    }
+    h4:first-letter {
+      font-size: var(--FL1);
+    }
+    table {
+      border-spacing: 5mm var(--LH);
+    }
+
+    .title {
+      margin-top: 30mm;
+      width: 120%;
+      position: relative;
+      left: -10%;
+      page-break-after: always;
+    }
+    .title_image {
+      width: 100%;
+    }
+    .title_text {
+      text-align: center;
+      text-transform: uppercase;
+      font-size: 10mm;
+    }
+    .title_author {
+      text-align: center;
+      font-size: 3mm;
+      padding-top: 3mm;
+      padding-bottom: 1mm;
+    }
+
+    .section_image{
+      width: 100%;
+    }
+
+    .example {
+      font-size: var(--FS);
+      border: 1pt solid;
+      padding: 2.5mm 2.5mm 2.5mm 2.5mm;
+      margin: 0mm 0mm 2mm 0mm;
+      text-indent:3mm;
+    }
+    .example p {
+      margin-bottom: 0.5mm;
+      margin-top: 2pt;
+    }
+
+    </style>    
+</head>
+<body>
+<div>
+
+@{generate_html()}
+
+</div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+name: CI
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+
+  generate-pdf:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get install lua5.3 lua-socket weasyprint
+          sudo apt-get purge weasyprint
+
+      - name: Build
+        run: |
+          curl -o dw.zip https://codeload.github.com/Kozea/WeasyPrint/zip/refs/tags/v60.2
+          unzip dw.zip
+          rm dw.zip
+          curl -o dw.zip https://codeload.github.com/CourtBouillon/pydyf/zip/refs/tags/v0.8.0
+          unzip dw.zip
+          rm dw.zip
+          sed 's/if __name__/print("DEBUG args")\nfor k,v in enumerate(sys.argv):\n\tprint("DEBUG",k,v)\n\nif __name__/' -i WeasyPrint-60.2/weasyprint/__main__.py 
+          echo '#!/bin/sh' > weasyprint
+          echo 'python -m weasyprint $@' >> weasyprint
+          chmod u+x weasyprint
+          chmod u+x ./util/fw_extract.lua
+          PATH="./:$PATH" PYTHONPATH="./WeasyPrint-60.2:./pydyf-0.8.0:$PYTHONPATH" ./util/fw_extract.lua
+
+      - name: Store artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: "OUTs" #destination
+          path: | #source
+            build/fantasy_world_en.pdf
+            build/fantasy_world_en.html
+            build/fantasy_world_ita.pdf
+            build/fantasy_world_ita.html
+
+  release:
+    if: github.event_name == 'push'
+    needs: [generate-pdf]
+    runs-on: ubuntu-22.04
+
+    steps:
+
+      - name: Download Raspberry artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: OUTs #source
+          path: release #destination
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: Automatic Release (${{ github.event.head_commit.timestamp }})
+          tag_name: release.${{ github.sha }}
+          files: release/*
+
