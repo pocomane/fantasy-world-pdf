@@ -27,7 +27,6 @@ jobs:
           curl -o dw.zip https://codeload.github.com/CourtBouillon/pydyf/zip/refs/tags/v0.8.0
           unzip dw.zip
           rm dw.zip
-          sed 's/if __name__/print("DEBUG args")\nfor k,v in enumerate(sys.argv):\n\tprint("DEBUG",k,v)\n\nif __name__/' -i WeasyPrint-60.2/weasyprint/__main__.py 
           echo '#!/bin/sh' > weasyprint
           echo 'python -m weasyprint $@' >> weasyprint
           chmod u+x weasyprint
