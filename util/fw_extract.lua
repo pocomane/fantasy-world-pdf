@@ -76,8 +76,9 @@ end
 local function main(nm, ofs, inp)
   exec('mkdir -p build')
 
+  local tocref = '<a href="#reference-toc"><div class="page-toc-ref"></div></a>'
   local front = '<div class="title_text">Fantasy World</div><div class="title_author">Alessandro Piroddi, Luca Maiorani, MS Edizioni, 2020-2023 - CC BY 4.0</div>\n\n<div class="PageBreak"></div>\n\n'
-  local toc = '<div class="toc">\n<h2>Table of the contents<h2>\n\n'
+  local toc = '\n'..tocref..'<div class="toc" id="reference-toc">\n<h2>Table of the contents<h2>\n\n'
   local page = '</div>\n\n'
 
   local http = require 'socket.http'
