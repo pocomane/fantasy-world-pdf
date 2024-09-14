@@ -1,6 +1,9 @@
 #!/bin/lua
 
+local BUILDDIR = "build"
+
 local function exec(cmd)
+  print('executing: '..cmd)
   if not os.execute(cmd) then
     error('command execution failed')
   end
@@ -17,12 +20,32 @@ local function load_file(path)
 end
 
 local function store_file(path, content)
-  local f = io.open(path, "w")
+  local f, e = io.open(path, "w")
   if e then
-    return nil, 'can not open '..path
+    error('can not open '..path)
   end
-  f:write(content)
+  if content then f:write(content) end
   f:close()
+end
+
+local function prepare_deps()
+  exec("mkdir -p '"..BUILDDIR.."'")
+  if not load_file(BUILDDIR.."/weasyprint.done") then
+    exec("cd '"..BUILDDIR.."' && curl -o dw.zip https://codeload.github.com/Kozea/WeasyPrint/zip/refs/tags/v60.2")
+    exec("cd '"..BUILDDIR.."' && unzip dw.zip")
+    exec("cd '"..BUILDDIR.."' && rm dw.zip")
+    store_file(BUILDDIR..'/weasyprint.done')
+  end
+  if not load_file(BUILDDIR.."/pydyf.done") then
+    exec("cd '"..BUILDDIR.."' && curl -o dw.zip https://codeload.github.com/CourtBouillon/pydyf/zip/refs/tags/v0.8.0")
+    exec("cd '"..BUILDDIR.."' && unzip dw.zip")
+    exec("cd '"..BUILDDIR.."' && rm dw.zip")
+    store_file(BUILDDIR..'/pydyf.done')
+  end
+end
+
+local function pythonrun(args)
+  exec([[export PYTHONPATH="]]..BUILDDIR..[[/WeasyPrint-60.2:]]..BUILDDIR..[[/pydyf-0.8.0:$PYTHONPATH"; python3 ]]..args)
 end
 
 local function extract_content(part)
@@ -73,11 +96,9 @@ local function add_page_info(ofs, ref, toc)
   )
 end
 
-local function main(nm, ofs, inp)
-  exec('mkdir -p build')
+local function scrape(nm, ofs, inp)
 
   local tocref = '<a href="#reference-toc"><div class="page-toc-ref"></div></a>'
-  local front = '<div class="title_text">Fantasy World</div><div class="title_author">Alessandro Piroddi, Luca Maiorani, MS Edizioni, 2020-2023 - CC BY 4.0</div>\n\n<div class="PageBreak"></div>\n\n'
   local toc = '\n'..tocref..'<div class="toc" id="reference-toc">\n<h2>Table of the contents<h2>\n\n'
   local page = '</div>\n\n'
 
@@ -95,50 +116,68 @@ local function main(nm, ofs, inp)
     toc = add_toc(toc, ttoc, itoc)
 
   end
-  store_file('build/'..nm..'_tmp_001.html', page)
-  store_file('build/'..nm..'_tmp_002.html', toc)
+  store_file(BUILDDIR..'/'..nm..'_tmp_001.html', page)
+  store_file(BUILDDIR..'/'..nm..'_tmp_002.html', toc)
+end
 
-  local page = load_file('build/'..nm..'_tmp_001.html') 
-  local toc = load_file('build/'..nm..'_tmp_002.html') 
+local function render(nm, ofs)
+  
+  local front = '<div class="title_text">Fantasy World</div><div class="title_author">Alessandro Piroddi, Luca Maiorani, MS Edizioni, 2020-2023 - CC BY 4.0</div>\n\n<div class="PageBreak"></div>\n\n'
+
+  local page = load_file(BUILDDIR..'/'..nm..'_tmp_001.html') 
+  local toc =  load_file(BUILDDIR..'/'..nm..'_tmp_002.html') 
 
   local template = load_file('util/a5.html')
 
   local outhtml = template:gsub("@{generate_html%(%)}", function() return front .. toc .. page end)
 
-  store_file("build/"..nm..".html", outhtml)
+  store_file(BUILDDIR..'/'..nm..".html", outhtml)
 
-  print('generating page numbering info...')
-  exec('chmod ugo+x util/wp_wrap.py')
-  exec('util/wp_wrap.py build/'..nm..'.html > build/'..nm..'.inf')
-  local pg = load_file('build/'..nm..'.inf')
-  local ref = {}
-  for a, b in pg:gmatch('anchor ([0-9]+) ([^\n\r]+)') do
-    ref[b] = a
-  end
-  toc = add_page_info(ofs, ref, toc)
+  -- print('generating page numbering info...')
+  -- exec('chmod ugo+x util/wp_wrap.py')
+  -- pythonrun('util/wp_wrap.py "'..BUILDDIR..'"/'..nm..'.html > "'..BUILDDIR..'"/'..nm..'.inf')
+  -- local pg = load_file(BUILDDIR..'/'..nm..'.inf')
+  -- local ref = {}
+  -- for a, b in pg:gmatch('anchor ([0-9]+) ([^\n\r]+)') do
+  --   ref[b] = a
+  -- end
+  -- toc = add_page_info(ofs, ref, toc)
 
   local tmphtml = template:gsub("@{generate_html%(%)}", function() return front .. toc .. page end)
-  store_file("build/"..nm.."_temp.html", tmphtml)
+  store_file(BUILDDIR..'/'..nm.."_temp.html", tmphtml)
 
   print('rendering pdf...')
-  exec('weasyprint build/'..nm..'_temp.html build/'..nm..'.pdf')
+  pythonrun('-m weasyprint "'..BUILDDIR..'"/'..nm..'_temp.html "'..BUILDDIR..'"/'..nm..'.pdf')
 end
 
-main("fantasy_world_en", 2, {
-  "http://fantasyworldrpg.com/eng/1-Fundamental-Knowledge.html",
-  "http://fantasyworldrpg.com/eng/2-Essential-Mechanics.html",
-  "http://fantasyworldrpg.com/eng/3-The-First-Session.html",
-  "http://fantasyworldrpg.com/eng/4-The-World.html",
-  "http://fantasyworldrpg.com/eng/5-Game-Moves.html",
-  "http://fantasyworldrpg.com/eng/6-Changing-the-Rules.html",
-})
+local function scrape_and_render(nm, ofs, inp)
 
-main("fantasy_world_ita", 1, {
-  "http://fantasyworldrpg.com/ita/1-Nozioni-Fondamentali.html",
-  "http://fantasyworldrpg.com/ita/2-Meccaniche-Essenziali.html",
-  "http://fantasyworldrpg.com/ita/3-La-Prima-Sessione.html",
-  "http://fantasyworldrpg.com/ita/4-Il-Mondo.html",
-  "http://fantasyworldrpg.com/ita/5-Mosse-di-Gioco.html",
-  "http://fantasyworldrpg.com/ita/6-Cambiare-le-Regole.html",
-})
+  scrape(nm, ofs, inp)
+  render(nm, ofs)
+end
+
+function main()
+
+  prepare_deps()
+  
+  scrape_and_render("fantasy_world_en", 2, {
+    "http://fantasyworldrpg.com/eng/1-Fundamental-Knowledge.html",
+    "http://fantasyworldrpg.com/eng/2-Essential-Mechanics.html",
+    "http://fantasyworldrpg.com/eng/3-The-First-Session.html",
+    "http://fantasyworldrpg.com/eng/4-The-World.html",
+    "http://fantasyworldrpg.com/eng/5-Game-Moves.html",
+    "http://fantasyworldrpg.com/eng/6-Changing-the-Rules.html",
+  })
+  
+  scrape_and_render("fantasy_world_ita", 1, {
+    "http://fantasyworldrpg.com/ita/1-Nozioni-Fondamentali.html",
+    "http://fantasyworldrpg.com/ita/2-Meccaniche-Essenziali.html",
+    "http://fantasyworldrpg.com/ita/3-La-Prima-Sessione.html",
+    "http://fantasyworldrpg.com/ita/4-Il-Mondo.html",
+    "http://fantasyworldrpg.com/ita/5-Mosse-di-Gioco.html",
+    "http://fantasyworldrpg.com/ita/6-Cambiare-le-Regole.html",
+  })
+end
+
+main()
 
