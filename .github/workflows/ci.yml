@@ -16,7 +16,7 @@ jobs:
 
       - name: Install Build Dependencies
         run: |
-          sudo apt-get install lua5.3 lua-socket weasyprint
+          sudo apt-get install lua5.3 lua-socket weasyprint discount vim
           sudo apt-get purge weasyprint
 
       - name: Build
