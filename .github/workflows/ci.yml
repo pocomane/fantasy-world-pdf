@@ -42,6 +42,8 @@ jobs:
             build/fantasy_world_en.html
             build/fantasy_world_ita.pdf
             build/fantasy_world_ita.html
+            build/the_world.html
+            build/the_world.pdf
 
   release:
     if: github.event_name == 'push'
