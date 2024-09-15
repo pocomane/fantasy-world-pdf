@@ -21,15 +21,6 @@ jobs:
 
       - name: Build
         run: |
-          curl -o dw.zip https://codeload.github.com/Kozea/WeasyPrint/zip/refs/tags/v60.2
-          unzip dw.zip
-          rm dw.zip
-          curl -o dw.zip https://codeload.github.com/CourtBouillon/pydyf/zip/refs/tags/v0.8.0
-          unzip dw.zip
-          rm dw.zip
-          echo '#!/bin/sh' > weasyprint
-          echo 'python -m weasyprint $@' >> weasyprint
-          chmod u+x weasyprint
           chmod u+x ./util/fw_extract.lua
           PATH="./:$PATH" PYTHONPATH="./WeasyPrint-60.2:./pydyf-0.8.0:$PYTHONPATH" ./util/fw_extract.lua
 
