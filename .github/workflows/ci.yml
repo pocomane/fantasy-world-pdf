@@ -21,8 +21,8 @@ jobs:
 
       - name: Build
         run: |
-          chmod u+x ./util/fw_extract.lua
-          PATH="./:$PATH" PYTHONPATH="./WeasyPrint-60.2:./pydyf-0.8.0:$PYTHONPATH" ./util/fw_extract.lua
+          chmod u+x ./util/make.lua
+          PATH="./:$PATH" PYTHONPATH="./WeasyPrint-60.2:./pydyf-0.8.0:$PYTHONPATH" ./util/make.lua
 
       - name: Store artifact
         uses: actions/upload-artifact@v3

@@ -1,4 +1,3 @@
-#!/bin/lua
 
 local BUILDDIR = "build"
 
@@ -10,9 +9,9 @@ local function exec(cmd)
 end
 
 local function load_file(path)
-  local f, e = io.open(path, 'r')
+  local f, e = io.open(path, 'rb')
   if e then
-    return nil, 'can not find '..path
+    error('can not open '..path)
   end
   local c = f:read('a')
   f:close()
@@ -20,7 +19,7 @@ local function load_file(path)
 end
 
 local function store_file(path, content)
-  local f, e = io.open(path, "w")
+  local f, e = io.open(path, "wb")
   if e then
     error('can not open '..path)
   end
@@ -30,13 +29,13 @@ end
 
 local function prepare_deps()
   exec("mkdir -p '"..BUILDDIR.."'")
-  if not load_file(BUILDDIR.."/weasyprint.done") then
+  if not pcall(load_file, BUILDDIR.."/weasyprint.done") then
     exec("cd '"..BUILDDIR.."' && curl -o dw.zip https://codeload.github.com/Kozea/WeasyPrint/zip/refs/tags/v60.2")
     exec("cd '"..BUILDDIR.."' && unzip dw.zip")
     exec("cd '"..BUILDDIR.."' && rm dw.zip")
     store_file(BUILDDIR..'/weasyprint.done')
   end
-  if not load_file(BUILDDIR.."/pydyf.done") then
+  if not pcall(load_file, BUILDDIR.."/pydyf.done") then
     exec("cd '"..BUILDDIR.."' && curl -o dw.zip https://codeload.github.com/CourtBouillon/pydyf/zip/refs/tags/v0.8.0")
     exec("cd '"..BUILDDIR.."' && unzip dw.zip")
     exec("cd '"..BUILDDIR.."' && rm dw.zip")
@@ -236,15 +235,11 @@ local function mdize(nm)
   page = page:gsub('&#x([0-9A-Fa-f][0-9A-Fa-f]);', function(a) return string.char(tonumber(a,16))  end)
   page = page:gsub('&#x([0-9A-Fa-f][0-9A-Fa-f])([0-9A-Fa-f][0-9A-Fa-f]);', function(a,b) return string.char(tonumber(a,16))..string.char(tonumber(b,16))  end)
 
+  page = "\nLicensed under CC BY 4.0 by Alessandro Piroddi, Luca Maiorani, MS Edizioni, 2020-2023. Got from https://fantasyworldrpg.com\n" .. page
+
   local outmd = BUILDDIR.."/"..nm..".md"
-
-  local f = io.open(outmd, "w")
-  if nil == f then error('can not open out file') end
-  f:write("\nLicensed under CC BY 4.0 by Alessandro Piroddi, Luca Maiorani, MS Edizioni, 2020-2023. Got from https://fantasyworldrpg.com\n")
-  f:write(page)
-  f:close()
-
-  os.execute([[vim -n -c "set nocindent" -c "normal ggvGgq" -c wq "]]..outmd..[["]])
+  store_file(outmd, page)
+  exec([[vim -n -c "set nocindent" -c "normal ggvGgq" -c wq "]]..outmd..[["]])
 
 end
 
@@ -265,14 +260,14 @@ local function scrape_and_mdize(nm, ofs, inp)
 
   scrape(nm, ofs, inp)
   mergehtml(nm, ofs, false)
-  htmltemplate(nm)
+  exec('cp "'..BUILDDIR..'/'..nm..'_merged.html" "'..BUILDDIR..'/'..nm..'_temp.html"')
   mdize(nm)
 
 end
 
 local function md_html_pdf(nm)
   print('rendering md...')
-  exec('markdown "'..nm..'.md" > "'..BUILDDIR.. '"/'..nm..'.html')
+  exec('markdown -ffencedcode "'..nm..'.md" > "'..BUILDDIR.. '"/'..nm..'.html')
   htmltemplate(nm)
   render(nm)
 end

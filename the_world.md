@@ -32,6 +32,11 @@ Piroddi, Luca Maiorani, MS Edizioni, 2020-2023. The modification are so minimal
 that you can not give credit for them at all. If you really need an official
 statement: they are released under CC0 by Mimmo Mane, 2023.
 
+```
+Paragraphs like this one contain examples, notes, highlights and generally any
+kind of content that is complementary to the main one.
+```
+
 # Agenda
 
   - Play to find out
