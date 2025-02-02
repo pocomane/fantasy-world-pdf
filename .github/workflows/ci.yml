@@ -1,58 +1,24 @@
-name: CI
-
+name: Make_All
 on: [push, pull_request, workflow_dispatch]
-
 jobs:
-
-  generate-pdf:
+  Make_All:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Install Build Dependencies
-        run: |
+      - uses: actions/checkout@v2
+      - run: |
           sudo apt-get install lua5.3 lua-socket weasyprint discount vim
           sudo apt-get purge weasyprint
-
-      - name: Build
-        run: |
-          chmod u+x ./util/make.lua
-          PATH="./:$PATH" PYTHONPATH="./WeasyPrint-60.2:./pydyf-0.8.0:$PYTHONPATH" ./util/make.lua
-
-      - name: Store artifact
-        uses: actions/upload-artifact@v3
+      - run: PATH="./:$PATH" PYTHONPATH="./WeasyPrint-60.2:./pydyf-0.8.0:$PYTHONPATH" lua ./make.lua
+      - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT"
+        id: version_check
+      - uses: softprops/action-gh-release@v1
         with:
-          name: "OUTs" #destination
-          path: | #source
-            build/fantasy_world_en.pdf
-            build/fantasy_world_en.html
-            build/fantasy_world_ita.pdf
-            build/fantasy_world_ita.html
-            build/the_world.html
-            build/the_world.pdf
-
-  release:
-    if: github.event_name == 'push'
-    needs: [generate-pdf]
-    runs-on: ubuntu-22.04
-
-    steps:
-
-      - name: Download Raspberry artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: OUTs #source
-          path: release #destination
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          body: Automatic Release (${{ github.event.head_commit.timestamp }})
-          tag_name: release.${{ github.sha }}
-          files: release/*
+          tag_name: ${{steps.version_check.outputs.TAG_NAME}}
+          files: |
+             build/fantasy_world_en.pdf
+             build/fantasy_world_en.html
+             build/fantasy_world_ita.pdf
+             build/fantasy_world_ita.html
+             build/the_world.html
+             build/the_world.pdf
 
