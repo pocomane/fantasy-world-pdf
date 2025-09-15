@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: ./util/runalp.sh
+      - run: ./util/make.sh
       - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT"
         id: version_check
       - uses: softprops/action-gh-release@v1

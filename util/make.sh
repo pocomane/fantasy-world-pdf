@@ -173,9 +173,7 @@ container_prerun(){
   # # If you place an 'exit 0' at end, the command line will not
   # # be execute, so you can use it to run always the same command, e.g.
 
-  apk add curl lua lua-socket discount vim
-  apk add py3-html5lib
-  apk add -s weasyprint | head -n -2 | sed 's/.*Installing \([^(]*\) (.*/\1/g' | xargs -- apk add
+  apk add curl lua lua-socket discount vim weasyprint
   lua5.4 "$SCRDIR/fw_extract.lua"
 }
 

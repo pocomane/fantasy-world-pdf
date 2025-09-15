@@ -27,24 +27,8 @@ local function store_file(path, content)
   f:close()
 end
 
-local function prepare_deps()
-  exec("mkdir -p '"..BUILDDIR.."'")
-  if not pcall(load_file, BUILDDIR.."/weasyprint.done") then
-    exec("cd '"..BUILDDIR.."' && curl -o dw.zip https://codeload.github.com/Kozea/WeasyPrint/zip/refs/tags/v60.2")
-    exec("cd '"..BUILDDIR.."' && unzip dw.zip")
-    exec("cd '"..BUILDDIR.."' && rm dw.zip")
-    store_file(BUILDDIR..'/weasyprint.done')
-  end
-  if not pcall(load_file, BUILDDIR.."/pydyf.done") then
-    exec("cd '"..BUILDDIR.."' && curl -o dw.zip https://codeload.github.com/CourtBouillon/pydyf/zip/refs/tags/v0.8.0")
-    exec("cd '"..BUILDDIR.."' && unzip dw.zip")
-    exec("cd '"..BUILDDIR.."' && rm dw.zip")
-    store_file(BUILDDIR..'/pydyf.done')
-  end
-end
-
 local function pythonrun(args)
-  exec([[pwd;ls;export PYTHONPATH="]]..BUILDDIR..[[/WeasyPrint-60.2:]]..BUILDDIR..[[/pydyf-0.8.0:$PYTHONPATH"; python3 ]]..args)
+  exec([[python3 ]]..args)
 end
 
 local function extract_content(part)
@@ -86,19 +70,10 @@ local function add_toc(toc, title, index)
   return toc
 end
 
-local function add_page_info(ofs, ref, toc)
-  return toc:gsub(
-    '(<li><a href="#)([^"]*)(">.-)(</a>)',
-    function(a,b,c,d)
-      return a..b..c..( ref[b] and (' ... p'..math.floor(ref[b]+ofs)) or'')..d
-    end
-  )
-end
-
 local function scrape(nm, ofs, inp)
 
-  local tocref = '<a href="#reference-toc"><div class="page-toc-ref"></div></a>'
-  local toc = '\n'..tocref..'<div class="toc" id="reference-toc">\n<h2>Table of the contents<h2>\n\n'
+  --local tocref = '<a href="#reference-toc"><div class="page-toc-ref"></div></a>'
+  local toc = '\n<div class="toc" id="reference-toc">\n<h2>Table of the contents<h2>\n\n'
   local page = '</div>\n\n'
 
   local http = require 'socket.http'
@@ -135,15 +110,6 @@ local function mergehtml(nm, ofs, addinfo)
   if not addinfo then
     exec('cp "'..BUILDDIR..'/'..nm..'_merged.html"'..' "'..BUILDDIR..'/'..nm..'.html"')
   else
-    print('generating page numbering info...')
-    exec('chmod ugo+x util/wp_wrap.py')
-    pythonrun('util/wp_wrap.py "'..BUILDDIR..'/'..nm..'_merged.html" > "'..BUILDDIR..'/'..nm..'.inf"')
-    local pg = load_file(BUILDDIR..'/'..nm..'.inf')
-    local ref = {}
-    for a, b in pg:gmatch('anchor ([0-9]+) ([^\n\r]+)') do
-      ref[b] = a
-    end
-    toc = add_page_info(ofs, ref, toc)
     store_file(BUILDDIR..'/'..nm..".html", front .. toc .. page)
   end
 end
@@ -273,8 +239,6 @@ local function md_html_pdf(nm)
 end
 
 function main()
-
-  prepare_deps()
 
   scrape_and_mdize("the_world_en", 2, {
     "http://fantasyworldrpg.com/eng/4-The-World.html",

@@ -195,6 +195,10 @@
       width: 100%;
     }
 
+    a::after{
+      content: " [pg." target-counter(attr(href), page) "]"; //target-counter(attr(href), page);
+    }
+
     </style>    
 </head>
 <body>
