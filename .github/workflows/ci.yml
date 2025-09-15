@@ -5,11 +5,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-      - uses: actions/checkout@v2    
+      - uses: actions/checkout@v2  
       - name: Setup latest Alpine Linux
         uses: jirutka/setup-alpine@v1
+        with:
+          branch: v3.21.3
+          packages: >
+            curl
+            lua
+            lua-socket
+            discount
+            vim
+            weasyprint
       - name: Build all
-        run: apk add curl ; ./util/make.sh
+        run: lua5.4 "$SCRDIR/fw_extract.lua"
         shell: alpine.sh --root {0}
         
       - uses: actions/checkout@v2
