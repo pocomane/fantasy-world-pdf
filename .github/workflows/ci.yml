@@ -19,7 +19,7 @@ jobs:
             weasyprint
       - name: Build all
         run: mkdir -p ./build ; lua5.4 "./util/fw_extract.lua"
-        shell: alpine.sh --root {0}
+        shell: alpine.sh {0}
         
       - uses: actions/checkout@v2
       - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT"
