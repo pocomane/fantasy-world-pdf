@@ -5,9 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: sudo add-apt-repository ppa:apparmor-dev/apparmor-sru
-      - run: sudo apt update
-      - run: sudo apt install apparmor
       - run: ./util/make.sh
       - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT"
         id: version_check
