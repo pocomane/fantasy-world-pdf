@@ -5,10 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          sudo apt-get install lua5.3 lua-socket weasyprint discount vim
-          sudo apt-get purge weasyprint
-      - run: PATH="./:$PATH" PYTHONPATH="./WeasyPrint-60.2:./pydyf-0.8.0:$PYTHONPATH" ./util/make.lua
+      - run: ./util/runalp.sh
       - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT"
         id: version_check
       - uses: softprops/action-gh-release@v1

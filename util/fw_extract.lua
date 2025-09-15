@@ -44,7 +44,7 @@ local function prepare_deps()
 end
 
 local function pythonrun(args)
-  exec([[export PYTHONPATH="]]..BUILDDIR..[[/WeasyPrint-60.2:]]..BUILDDIR..[[/pydyf-0.8.0:$PYTHONPATH"; python3 ]]..args)
+  exec([[pwd;ls;export PYTHONPATH="]]..BUILDDIR..[[/WeasyPrint-60.2:]]..BUILDDIR..[[/pydyf-0.8.0:$PYTHONPATH"; python3 ]]..args)
 end
 
 local function extract_content(part)
