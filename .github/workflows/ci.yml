@@ -4,12 +4,14 @@ jobs:
   Make_All:
     runs-on: ubuntu-latest
     steps:
-      - uses: jirutka/setup-alpine@v1
-        with:
-          branch: v3.15
-      - run: ./util/make.sh
-      - shell: alpine.sh {0}
+      - uses: actions/checkout@v2    
+      - name: Setup latest Alpine Linux
+        uses: jirutka/setup-alpine@v1
+      - name: Build all
+        run: ./util/make.sh
+        shell: alpine.sh {0}
       - uses: actions/checkout@v2
+      - name: Release all
       - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT"
         id: version_check
       - uses: softprops/action-gh-release@v1
