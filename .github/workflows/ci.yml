@@ -5,12 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: echo "abi , include" > "/etc/apparmor.d/bwrap"
-      - run: echo "profile bwrap /usr/bin/bwrap flags=(unconfined) {" >>  "/etc/apparmor.d/bwrap"  
-      - run: echo "  userns," >>  "/etc/apparmor.d/bwrap"  
-      - run: echo "  include if exists" >>  "/etc/apparmor.d/bwrap"   
-      - run: echo "}" >>  "/etc/apparmor.d/bwrap"  
-      - run: systemctl restart apparmor.service
+      - run: sudo echo "abi , include" > "/etc/apparmor.d/bwrap"
+      - run: sudo echo "profile bwrap /usr/bin/bwrap flags=(unconfined) {" >>  "/etc/apparmor.d/bwrap"  
+      - run: sudo echo "  userns," >>  "/etc/apparmor.d/bwrap"  
+      - run: sudo echo "  include if exists" >>  "/etc/apparmor.d/bwrap"   
+      - run: sudo echo "}" >>  "/etc/apparmor.d/bwrap"  
+      - run: sudo systemctl restart apparmor.service
       - run: ./util/make.sh
       - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT"
         id: version_check
