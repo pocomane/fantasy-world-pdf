@@ -18,10 +18,10 @@ jobs:
             vim
             weasyprint
       - name: Build all
-        run: mkdir -p ./build ; lua5.4 "./util/fw_extract.lua" ; ls ; echo "<<<>>>" ; ls build/*
+        run: mkdir -p ./build ; lua5.4 "./util/fw_extract.lua"
         shell: alpine.sh {0}
         
-      - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT" ; ls ; echo "<<<>>>" ; ls build/*
+      - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT"
         id: version_check
       - uses: softprops/action-gh-release@v1
         with:
