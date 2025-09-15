@@ -9,7 +9,7 @@ jobs:
       - name: Setup latest Alpine Linux
         uses: jirutka/setup-alpine@v1
       - name: Build all
-        run: ./util/make.sh
+        run: apk add curl ; ./util/make.sh
         shell: alpine.sh --root {0}
         
       - uses: actions/checkout@v2
