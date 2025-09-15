@@ -7,6 +7,7 @@ jobs:
       - uses: jirutka/setup-alpine@v1
         with:
           branch: v3.15
+      - shell: alpine.sh {0}
       - run: ./util/make.sh
       - uses: actions/checkout@v2
       - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT"
