@@ -18,7 +18,7 @@ jobs:
             vim
             weasyprint
       - name: Build all
-        run: lua5.4 "./util/fw_extract.lua"
+        run: mkdir -p ./build ; lua5.4 "./util/fw_extract.lua"
         shell: alpine.sh --root {0}
         
       - uses: actions/checkout@v2
