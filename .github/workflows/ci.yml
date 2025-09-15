@@ -5,6 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: sudo mkdir -p "/etc/apparmor.d"
       - run: sudo echo "abi , include" > "/etc/apparmor.d/bwrap"
       - run: sudo echo "profile bwrap /usr/bin/bwrap flags=(unconfined) {" >>  "/etc/apparmor.d/bwrap"  
       - run: sudo echo "  userns," >>  "/etc/apparmor.d/bwrap"  
