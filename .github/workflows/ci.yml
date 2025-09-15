@@ -4,12 +4,11 @@ jobs:
   Make_All:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: sudo add-apt-repository ppa:apparmor-dev/apparmor-sru
-      - run: sudo apt update
-      - run: sudo apt install apparmor
-      - run: sudo systemctl restart apparmor.service
+      - uses: jirutka/setup-alpine@v1
+        with:
+          branch: v3.15
       - run: ./util/make.sh
+      - uses: actions/checkout@v2
       - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT"
         id: version_check
       - uses: softprops/action-gh-release@v1
