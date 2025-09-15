@@ -4,8 +4,8 @@ jobs:
   Make_All:
     runs-on: ubuntu-latest
     steps:
-    
-      - uses: actions/checkout@v2  
+      - uses: actions/checkout@v2
+      
       - name: Setup latest Alpine Linux
         uses: jirutka/setup-alpine@v1
         with:
@@ -21,7 +21,6 @@ jobs:
         run: mkdir -p ./build ; lua5.4 "./util/fw_extract.lua" ; ls ; echo "<<<>>>" ; ls build/*
         shell: alpine.sh {0}
         
-      - uses: actions/checkout@v2
       - run: echo "TAG_NAME=v0.1-rc" >> "$GITHUB_OUTPUT" ; ls ; echo "<<<>>>" ; ls build/*
         id: version_check
       - uses: softprops/action-gh-release@v1
