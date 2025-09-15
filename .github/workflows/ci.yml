@@ -9,7 +9,7 @@ jobs:
       - name: Setup latest Alpine Linux
         uses: jirutka/setup-alpine@v1
         with:
-          branch: v3.21.3
+          branch: v3.21
           packages: >
             curl
             lua
